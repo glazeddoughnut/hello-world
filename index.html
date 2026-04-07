@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Erin Potter — Projects</title>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --accent-soft: #e0e7ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    header {
+      margin-bottom: 32px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .card {
+      display: block;
+      text-decoration: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    }
+
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .card-title {
+      margin: 0 0 6px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .card-url {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      word-break: break-all;
+    }
+
+    .card-description {
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Erin Potter</h1>
+      <p class="subtitle">
+        Small tools, experiments, and things that make life a little easier.
+      </p>
+    </header>
+
+    <main class="grid">
+      <a
+        class="card"
+        href="https://switches.erinpotter.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <h2 class="card-title">House Systems Map</h2>
+        <div class="card-url">switches.erinpotter.com</div>
+        <div class="card-description">
+          <!-- TODO: Add description -->
+          A tool for mapping switches, circuits, and breakers throughout the house.
+        </div>
+      </a>
+
+      <a
+        class="card"
+        href="https://ynab.erinpotter.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <h2 class="card-title">YNAB Savings Reshuffler</h2>
+        <div class="card-url">ynab.erinpotter.com</div>
+        <div class="card-description">
+          <!-- TODO: Add description -->
+          A utility to help reorganize and rebalance savings categories.
+        </div>
+      </a>
+    </main>
+
+    <footer>
+      More projects coming soon.
+    </footer>
+  </div>
+</body>
+</html>
