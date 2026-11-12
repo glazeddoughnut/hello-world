@@ -284,6 +284,44 @@
             line-height: 1.6
         }
 
+        .field {
+            width: 100%;
+            padding: 13px 15px;
+            border-radius: 11px;
+            border: 1px solid #536382;
+            background: #101a2d;
+            color: white;
+            font: inherit;
+            margin: 7px 0 12px
+        }
+
+        .roomcode {
+            font-size: 2.6rem;
+            letter-spacing: .17em;
+            color: #8ce8ff;
+            font-weight: 900;
+            text-align: center;
+            margin: 12px 0
+        }
+
+        .players {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0
+        }
+
+        .player {
+            padding: 14px;
+            border-radius: 12px;
+            background: #263149;
+            border: 1px solid #495875
+        }
+
+        .error {
+            color: #ffa0b0;
+            min-height: 22px
+        }
+
         .note {
             margin-top: 25px;
             color: #8e9bb6;
@@ -341,8 +379,35 @@
                             name="direction" value="name"><span>Name → Symbol</span></label><label class="pill"><input
                             type="radio" name="direction" value="mixed" checked><span>Mixed</span></label></div>
             </fieldset>
-            <div class="actions"><button class="btn" id="start">Start solo practice</button></div>
-            <p class="hint">20 questions, no repeated elements. Multiplayer rooms are coming next.</p>
+            <label for="playerName"><strong>Your player name</strong></label><input class="field" id="playerName"
+                maxlength="24" placeholder="Claire" autocomplete="nickname">
+            <div class="actions"><button class="btn" id="start">Start solo practice</button><button
+                    class="btn secondary" id="createRoom">Create room</button><button class="btn secondary"
+                    id="joinRoom">Join room</button></div>
+            <p id="setupError" class="error" role="alert"></p>
+            <p class="hint">20 questions, no repeated elements. Multiplayer lobby is ready to test.</p>
+        </section>
+        <section id="join" class="panel hidden">
+            <h2>Join a showdown</h2><label for="roomInput">Room code</label><input id="roomInput" class="field"
+                maxlength="5" placeholder="K7P4X" autocapitalize="characters" spellcheck="false">
+            <p id="joinError" class="error" role="alert"></p>
+            <div class="actions"><button class="btn" id="confirmJoin">Join room</button><button class="btn secondary"
+                    id="cancelJoin">Back</button></div>
+        </section>
+        <section id="lobby" class="panel hidden">
+            <h2>Waiting room</h2>
+            <p class="muted" id="lobbyRole"></p>
+            <div id="roomCode" class="roomcode"></div>
+            <p class="hint" style="text-align:center">Share this code with your opponent.</p>
+            <div class="players">
+                <div class="player" id="hostPlayer">Host: waiting...</div>
+                <div class="player" id="guestPlayer">Opponent: waiting...</div>
+            </div>
+            <p id="roomSettings" class="muted"></p>
+            <p id="lobbyStatus" class="hint" role="status">Waiting for opponent...</p>
+            <p id="lobbyError" class="error" role="alert"></p>
+            <div class="actions"><button class="btn" id="lobbyStart" disabled>Start Showdown (coming
+                    next)</button><button class="btn secondary" id="leaveRoom">Leave room</button></div>
         </section>
         <section id="game" class="panel hidden" aria-live="polite">
             <div class="scorebar"><span id="round">Round 1 of 20</span><span id="score">Score: 0</span></div>
@@ -374,12 +439,67 @@
         const pick = name => document.querySelector(`input[name="${name}"]:checked`).value;
         const shuffle = items => { const a = [...items]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; };
         let match = null;
-        function show(section) { for (const id of ['setup', 'game', 'results']) $(id).classList.toggle('hidden', id !== section); }
+        function show(section) { for (const id of ['setup', 'join', 'lobby', 'game', 'results']) $(id).classList.toggle('hidden', id !== section); }
         function start() { const difficulty = pick('difficulty'), direction = pick('direction'); const pool = difficulty === 'common' ? elements.slice(0, 30) : difficulty === 'less' ? elements.slice(30) : elements; match = { pool, questions: shuffle(pool).slice(0, 20), direction, index: 0, score: 0, answered: false }; show('game'); render(); }
         function render() { const { questions, index, score, pool, direction } = match; match.answered = false; const element = questions[index]; const mode = direction === 'mixed' ? (Math.random() < .5 ? 'symbol' : 'name') : direction; match.mode = mode; $('round').textContent = `Round ${index + 1} of ${questions.length}`; $('score').textContent = `Score: ${score}`; $('progress').style.width = `${index / questions.length * 100}%`; $('prompt').textContent = mode === 'symbol' ? 'Which element has this symbol?' : 'What is the symbol for this element?'; $('clue').textContent = mode === 'symbol' ? element.symbol : element.name; $('feedback').textContent = ''; $('feedback').className = 'feedback'; $('next').classList.add('hidden'); const distractors = shuffle(pool.filter(e => e !== element)).slice(0, 3); const answers = shuffle([element, ...distractors]); const container = $('answers'); container.replaceChildren(); for (const item of answers) { const btn = document.createElement('button'); btn.className = 'answer'; btn.textContent = mode === 'symbol' ? item.name : item.symbol; btn.dataset.number = item.number; btn.addEventListener('click', () => answer(item.number)); container.append(btn); } }
         function answer(number) { if (match.answered) return; match.answered = true; const correct = match.questions[match.index]; const won = number === correct.number; if (won) match.score++; $('score').textContent = `Score: ${match.score}`; for (const btn of $('answers').children) { btn.disabled = true; const n = Number(btn.dataset.number); if (n === correct.number) btn.classList.add('correct'); else if (n === number) btn.classList.add('wrong'); } const fb = $('feedback'); fb.className = 'feedback ' + (won ? 'good' : 'bad'); fb.textContent = won ? 'Correct! +1 point' : `Not quite — ${correct.symbol} is ${correct.name}.`; $('next').textContent = match.index === match.questions.length - 1 ? 'See results →' : 'Next question →'; $('next').classList.remove('hidden'); $('next').focus(); }
         function next() { if (!match || !match.answered) return; match.index++; if (match.index >= match.questions.length) { $('progress').style.width = '100%'; $('finalScore').textContent = `${match.score} / ${match.questions.length}`; $('finalMessage').textContent = match.score === 20 ? 'Perfect score! You know your elements.' : match.score >= 15 ? 'Excellent work! Ready for a rematch?' : match.score >= 10 ? 'Nice effort! A little more practice and you’ll be unstoppable.' : 'Every chemist starts somewhere. Give it another shot!'; show('results'); } else render(); }
         $('start').addEventListener('click', start); $('next').addEventListener('click', next); $('quit').addEventListener('click', () => show('setup')); $('again').addEventListener('click', start); $('settings').addEventListener('click', () => show('setup'));
+    </script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js';
+        import { getDatabase, ref, get, set, onValue, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/13.3.0/firebase-database.js';
+        const firebaseConfig = { apiKey: 'AIzaSyACRJWx1jjQkTxcUliYRGfWx78Fy_r5wI8', authDomain: 'element-showdown.firebaseapp.com', databaseURL: 'https://element-showdown-default-rtdb.firebaseio.com', projectId: 'element-showdown', storageBucket: 'element-showdown.firebasestorage.app', messagingSenderId: '431148195630', appId: '1:431148195630:web:d993ac3240551a3c0164bf' };
+        const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getDatabase(app);
+        let user = null, roomCode = null, unsubscribe = null;
+        const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        function makeCode() { const bytes = crypto.getRandomValues(new Uint8Array(5)); return Array.from(bytes, b => alphabet[b % alphabet.length]).join(''); }
+        function name() { return $('playerName').value.trim().slice(0, 24); }
+        function message(id, text) { $(id).textContent = text; }
+        async function signedIn() { if (user) return user; const result = await signInAnonymously(auth); user = result.user; return user; }
+        function stopListening() { if (unsubscribe) { unsubscribe(); unsubscribe = null; } }
+        function openLobby(code) {
+            stopListening(); roomCode = code; $('roomCode').textContent = code; show('lobby'); unsubscribe = onValue(ref(db, 'rooms/' + code), snapshot => {
+                const room = snapshot.val(); if (!room) { message('lobbyError', 'This room is no longer available.'); return; }
+                $('hostPlayer').textContent = 'Host: ' + room.host.name;
+                $('guestPlayer').textContent = room.guest ? 'Opponent: ' + room.guest.name : 'Opponent: waiting...';
+                $('roomSettings').textContent = 'Difficulty: ' + ({ common: 'Common (30)', less: 'Less Common (88)', all: 'All (118)' }[room.difficulty] || room.difficulty) + ' · Direction: ' + ({ symbol: 'Symbol → Name', name: 'Name → Symbol', mixed: 'Mixed' }[room.direction] || room.direction);
+                const isHost = room.host.uid === user.uid;
+                $('lobbyRole').textContent = isHost ? 'You are the host.' : 'You joined the room!';
+                $('lobbyStatus').textContent = room.guest ? 'Both players connected! Multiplayer questions are the next milestone.' : 'Waiting for another player to join...';
+            }, error => message('lobbyError', 'Unable to read room: ' + error.message));
+        }
+        $('createRoom').addEventListener('click', async () => {
+            message('setupError', ''); if (!name()) { message('setupError', 'Enter a player name first.'); return; }
+            $('createRoom').disabled = true;
+            try {
+                await signedIn(); let code, created = false;
+                for (let attempt = 0; attempt < 6 && !created; attempt++) {
+                    code = makeCode(); const room = { host: { uid: user.uid, name: name() }, difficulty: pick('difficulty'), direction: pick('direction'), status: 'waiting', createdAt: Date.now() };
+                    // Transaction prevents two hosts claiming the same code.
+                    const result = await runTransaction(ref(db, 'rooms/' + code), current => current === null ? room : undefined, { applyLocally: false }); created = result.committed;
+                }
+                if (!created) throw Error('Could not find an available room code.'); openLobby(code);
+            } catch (e) { message('setupError', 'Could not create room: ' + e.message); } finally { $('createRoom').disabled = false; }
+        });
+        $('joinRoom').addEventListener('click', () => { message('setupError', ''); if (!name()) { message('setupError', 'Enter a player name first.'); return; } show('join'); $('roomInput').focus(); });
+        $('cancelJoin').addEventListener('click', () => show('setup'));
+        $('confirmJoin').addEventListener('click', async () => {
+            const code = $('roomInput').value.trim().toUpperCase(); message('joinError', '');
+            if (!/^[A-HJ-NP-Z2-9]{5}$/.test(code)) { message('joinError', 'Enter the five-character room code.'); return; }
+            $('confirmJoin').disabled = true;
+            try {
+                await signedIn(); const roomRef = ref(db, 'rooms/' + code); const existing = (await get(roomRef)).val();
+                if (!existing) throw Error('Room not found.'); if (existing.host.uid === user.uid) throw Error('You are already the host of this room.');
+                if (existing.status !== 'waiting') throw Error('This match has already started.');
+                const guestRef = ref(db, 'rooms/' + code + '/guest');
+                const result = await runTransaction(guestRef, current => current === null ? { uid: user.uid, name: name() } : undefined, { applyLocally: false });
+                if (!result.committed) throw Error('This room already has two players.'); openLobby(code);
+            } catch (e) { message('joinError', 'Could not join room: ' + e.message); } finally { $('confirmJoin').disabled = false; }
+        });
+        $('leaveRoom').addEventListener('click', () => { stopListening(); roomCode = null; show('setup'); });
+        onAuthStateChanged(auth, current => { user = current; });
     </script>
 </body>
 
