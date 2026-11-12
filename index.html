@@ -1,187 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Erin Potter — Projects</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Penny's Projects</title>
+    <style>
+        :root {
+            font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+            color: #253147;
+            background: #f5f7fb
+        }
 
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --accent: #2563eb;
-      --accent-soft: #e0e7ff;
-    }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            box-sizing: border-box
+        }
 
-    * {
-      box-sizing: border-box;
-    }
+        .panel {
+            background: white;
+            border-radius: 20px;
+            padding: 36px;
+            max-width: 560px;
+            width: 100%;
+            box-shadow: 0 10px 35px #243a6315;
+            box-sizing: border-box
+        }
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
+        h1 {
+            margin: 0 0 8px;
+            color: #315b8c
+        }
 
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 32px 20px 48px;
-    }
+        p {
+            color: #647087
+        }
 
-    header {
-      margin-bottom: 32px;
-    }
+        nav {
+            display: grid;
+            gap: 12px;
+            margin-top: 24px
+        }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 2rem;
-    }
+        a {
+            display: block;
+            text-decoration: none;
+            color: #254d7c;
+            background: #edf4fd;
+            border: 1px solid #d7e6f8;
+            border-radius: 12px;
+            padding: 15px 18px;
+            font-weight: 650
+        }
 
-    a {
-      color: navy;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-
-    .grid {
-      display: grid;
-      gap: 20px;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    }
-
-    .card {
-      display: block;
-      text-decoration: none;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
-    }
-
-    .card:hover,
-    .card:focus-visible {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-      border-color: var(--accent);
-      outline: none;
-    }
-
-    .card-title {
-      margin: 0 0 6px;
-      font-size: 1.1rem;
-      font-weight: 700;
-    }
-
-    .card-url {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 10px;
-      word-break: break-all;
-    }
-
-    .card-description {
-      font-size: 0.92rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    footer {
-      margin-top: 40px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      text-align: center;
-    }
-  </style>
+        a:hover {
+            background: #dfeeff
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <header>
-      <h1>Erin Potter</h1>
-      <p class="subtitle">
-        Small tools, experiments, and things that make life a little easier.
-      </p>
-    </header>
-
-    <main class="grid">
-      <a
-        class="card"
-        href="https://switches.erinpotter.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <h2 class="card-title">House Systems Map</h2>
-        <div class="card-url">switches.erinpotter.com</div>
-        <div class="card-description">
-          A tool for mapping switches, circuits, and breakers throughout the house.
-        </div>
-      </a>
-      
-      <a
-        class="card"
-        href="https://ynab.erinpotter.com/savings.html"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <h2 class="card-title">Where Did the Savings Go?</h2>
-        <div class="card-url">ynab.erinpotter.com/savings.html</div>
-        <div class="card-description">
-          A month-by-month look at savings balances and the big purchases that explain where the money went.
-        </div>
-      </a>
-      
-      <a
-        class="card"
-        href="https://ynab.erinpotter.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <h2 class="card-title">YNAB Savings Reshuffler</h2>
-        <div class="card-url">ynab.erinpotter.com</div>
-        <div class="card-description">
-          A utility to help reorganize and rebalance savings categories.
-        </div>
-      </a>
-      
-       <a
-        class="card"
-        href="https://script.google.com/macros/s/AKfycbyKhAN4g9Ysgff_HHf5uUzr-19VtR_3BkH5Imk8Hso4Q8rSaGiFphkDrBemSzXE7Gw/exec"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <h2 class="card-title">Package Tracker - Stable</h2>
-        <div class="card-url">https://script.google.com/macros/s/AKfycbyKhAN4g9Ysgff_HHf5uUzr-19VtR_3BkH5Imk8Hso4Q8rSaGiFphkDrBemSzXE7Gw/exec</div>
-        <div class="card-description">
-          Keep track of packages during the busy season.
-        </div>
-      </a>
-      
-       <a
-        class="card"
-        href="https://script.google.com/macros/s/AKfycbz8nhS4GsRcOigZdEv3oPN71myO8xqSHCYNdKPzgw/dev"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <h2 class="card-title">Package Tracker - Dev</h2>
-        <div class="card-url">https://script.google.com/macros/s/AKfycbz8nhS4GsRcOigZdEv3oPN71myO8xqSHCYNdKPzgw/dev</div>
-        <div class="card-description">
-          Keep track of packages during the busy season.
-        </div>
-      </a>
+    <main class="panel">
+        <h1>Family Websites</h1>
+        <p>Schoolwork and web projects.</p>
+        <nav>
+            <a href="/penny/index.html">Penny</a>
+            <a href="/claire/index.html">Claire</a>
+        </nav>
     </main>
-
-    <footer>
-      More projects coming soon.
-    </footer>
-  </div>
 </body>
+
 </html>
