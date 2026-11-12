@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Claire's Driver's Ed Countdown</title>
+    <style>
+        :root {
+            font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+            color: #283248;
+            background: #f6f4fb
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            padding: 24px 16px 60px
+        }
+
+        .wrap {
+            max-width: 850px;
+            margin: auto
+        }
+
+        a {
+            color: #64449a
+        }
+
+        h1 {
+            font-size: clamp(1.7rem, 5vw, 2.5rem);
+            color: #51357d;
+            margin: 16px 0 4px
+        }
+
+        .sub {
+            color: #6c7280;
+            margin: 0 0 24px
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 7px 25px #352e6012;
+            margin-bottom: 18px
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px
+        }
+
+        .stat {
+            background: #f5f0fc;
+            border-radius: 13px;
+            padding: 18px 12px;
+            text-align: center
+        }
+
+        .stat strong {
+            font-size: clamp(1.5rem, 4vw, 2.1rem);
+            display: block;
+            color: #51357d
+        }
+
+        .stat span {
+            font-size: .85rem;
+            color: #666e7d
+        }
+
+        .progress {
+            height: 14px;
+            background: #e8e1f2;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 20px
+        }
+
+        .progress>div {
+            height: 100%;
+            width: 0;
+            background: #8d68c4;
+            transition: width .2s
+        }
+
+        .status {
+            border-left: 5px solid #8d68c4;
+            background: #f5f0fc;
+            border-radius: 8px;
+            padding: 16px 18px;
+            margin-top: 20px
+        }
+
+        .status.good {
+            border-color: #2b956d;
+            background: #eaf7f0
+        }
+
+        .status.bad {
+            border-color: #c74c57;
+            background: #fff0f1
+        }
+
+        .status h2 {
+            font-size: 1.2rem;
+            margin: 0 0 7px
+        }
+
+        .status p {
+            margin: 0;
+            line-height: 1.55
+        }
+
+        .lessons {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px
+        }
+
+        .lesson {
+            background: #faf9fc;
+            border: 1px solid #e8e3ee;
+            border-radius: 12px;
+            padding: 15px
+        }
+
+        .lesson label {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-weight: 650;
+            margin-bottom: 10px
+        }
+
+        .lesson input {
+            width: 100%;
+            accent-color: #7650b3
+        }
+
+        .lesson output {
+            color: #624193
+        }
+
+        .foot {
+            color: #6c7280;
+            font-size: .87rem;
+            line-height: 1.55
+        }
+
+        .section-title {
+            margin: 0 0 18px;
+            color: #51357d
+        }
+
+        button {
+            background: #64449a;
+            color: white;
+            border: 0;
+            border-radius: 9px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font: inherit
+        }
+
+        button:hover {
+            background: #50347d
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        @media(max-width:560px) {
+            .stats {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .stats .stat:last-child {
+                grid-column: 1/-1
+            }
+
+            .lessons {
+                grid-template-columns: 1fr
+            }
+
+            .card {
+                padding: 18px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrap"><a href="index.html">← Claire's Corner</a>
+        <h1>🚗 Driver's Ed Countdown</h1>
+        <p class="sub">30 hours of instruction · 10 lessons · maximum 3 hours per day · finish by November 28, 2026</p>
+        <section class="card">
+            <div class="stats">
+                <div class="stat"><strong id="completed">0</strong><span>Hours completed</span></div>
+                <div class="stat"><strong id="remaining">30</strong><span>Hours remaining</span></div>
+                <div class="stat"><strong id="days">—</strong><span>Study days left (including today)</span></div>
+            </div>
+            <div class="progress" role="progressbar" aria-label="Overall course completion" aria-valuemin="0"
+                aria-valuemax="100" aria-valuenow="0" id="progress">
+                <div id="progressFill"></div>
+            </div>
+            <div id="status" class="status" aria-live="polite">
+                <h2>Checking your schedule…</h2>
+            </div>
+        </section>
+        <section class="card">
+            <div class="row">
+                <h2 class="section-title">Lesson progress</h2><button type="button" id="reset">Reset
+                    percentages</button>
+            </div>
+            <p class="sub">Adjust each lesson to match the percentage shown by the course website. Changes save
+                automatically in this browser.</p>
+            <div class="lessons" id="lessons"></div>
+        </section>
+        <p class="foot">The calculation assumes each lesson is 3 hours long, percentages represent instructional time,
+            and Claire can use up to 3 hours on each remaining calendar day, including today. If she has already used
+            part of today's allowance, the estimate may be optimistic. Data is stored only in this browser; another
+            device or private browsing session won't share it.</p>
+    </main>
+    <script>
+        (() => {
+            'use strict';
+            const key = 'claire-drivers-ed-progress-v1';
+            const deadline = new Date(2026, 10, 28); // Last study day: Nov 28, local time
+            const totalHours = 30;
+            const dailyLimit = 3;
+            const container = document.getElementById('lessons');
+            let values;
+            try {
+                const saved = JSON.parse(localStorage.getItem(key));
+                values = Array.isArray(saved) && saved.length === 10
+                    ? saved.map(v => Math.min(100, Math.max(0, Number(v) || 0)))
+                    : Array(10).fill(0);
+            } catch { values = Array(10).fill(0); }
+            const fmt = n => Number(n.toFixed(2)).toLocaleString(undefined, { maximumFractionDigits: 2 });
+            function studyDaysLeft() {
+                const now = new Date();
+                const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+                const last = Date.UTC(deadline.getFullYear(), deadline.getMonth(), deadline.getDate());
+                return Math.max(0, Math.round((last - today) / 86400000) + 1);
+            }
+            function render() {
+                const completed = values.reduce((sum, percent) => sum + 3 * percent / 100, 0);
+                const remaining = Math.max(0, totalHours - completed);
+                const days = studyDaysLeft();
+                const daily = days ? remaining / days : Infinity;
+                const minDays = Math.ceil((remaining - 1e-9) / dailyLimit);
+                document.getElementById('completed').textContent = fmt(completed);
+                document.getElementById('remaining').textContent = fmt(remaining);
+                document.getElementById('days').textContent = days;
+                const pct = 100 * completed / totalHours;
+                document.getElementById('progressFill').style.width = `${pct}%`;
+                document.getElementById('progress').setAttribute('aria-valuenow', String(Math.round(pct)));
+                const status = document.getElementById('status');
+                let heading, detail, kind;
+                if (remaining < 0.000001) {
+                    heading = '🎉 All 30 hours complete!';
+                    detail = 'Claire is finished with the instruction requirement. Time to prepare for the written test!';
+                    kind = 'good';
+                } else if (daily > dailyLimit + 1e-9) {
+                    heading = '⚠️ The birthday deadline is no longer reachable';
+                    detail = days === 0
+                        ? `The November 28 study deadline has passed. At 3 hours per day, Claire still needs at least ${minDays} study ${minDays === 1 ? 'day' : 'days'}.`
+                        : `She needs ${fmt(daily)} hours per day to finish by November 28, but the course allows only 3. At least ${minDays} study days are needed.`;
+                    kind = 'bad';
+                } else {
+                    heading = `${fmt(daily)} hours per day to finish on time`;
+                    detail = `With ${days} calendar ${days === 1 ? 'day' : 'days'} available through November 28, she needs an average of ${fmt(daily)} hours per day. The 3-hour daily limit leaves ${fmt(days * dailyLimit - remaining)} hours of schedule flexibility.`;
+                    kind = 'good';
+                }
+                status.className = `status ${kind}`;
+                status.innerHTML = '';
+                const h = document.createElement('h2'); h.textContent = heading;
+                const p = document.createElement('p'); p.textContent = detail;
+                status.append(h, p);
+            }
+            values.forEach((value, i) => {
+                const lesson = document.createElement('div'); lesson.className = 'lesson';
+                const label = document.createElement('label'); label.htmlFor = `lesson-${i}`;
+                const name = document.createElement('span'); name.textContent = `Day ${i + 1}`;
+                const output = document.createElement('output'); output.htmlFor = `lesson-${i}`; output.textContent = `${fmt(value)}%`;
+                label.append(name, output);
+                const slider = document.createElement('input'); slider.type = 'range'; slider.id = `lesson-${i}`;
+                slider.min = '0'; slider.max = '100'; slider.step = '1'; slider.value = value;
+                slider.addEventListener('input', () => {
+                    values[i] = Number(slider.value);
+                    output.textContent = `${fmt(values[i])}%`;
+                    try { localStorage.setItem(key, JSON.stringify(values)); } catch { }
+                    render();
+                });
+                lesson.append(label, slider); container.append(lesson);
+            });
+            document.getElementById('reset').addEventListener('click', () => {
+                if (!confirm('Reset all ten lesson percentages to zero?')) return;
+                values.fill(0);
+                document.querySelectorAll('#lessons input').forEach((slider, i) => {
+                    slider.value = '0'; slider.parentElement.querySelector('output').textContent = '0%';
+                });
+                try { localStorage.setItem(key, JSON.stringify(values)); } catch { }
+                render();
+            });
+            render();
+            document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+        })();
+    </script>
+</body>
+
+</html>
