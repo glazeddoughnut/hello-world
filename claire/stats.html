@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Element Showdown · Stats</title>
+    <style>
+        :root {
+            font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+            color-scheme: dark;
+            background: #101525;
+            color: #f5f7ff
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 10% 0%, #26395b 0, transparent 52%), #101525
+        }
+
+        .wrap {
+            max-width: 1060px;
+            margin: auto;
+            padding: 36px 18px 80px
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: .23em;
+            color: #9dc4ff;
+            font-size: .75rem;
+            font-weight: 800
+        }
+
+        h1 {
+            font-size: clamp(2.3rem, 7vw, 4rem);
+            margin: 8px 0;
+            background: linear-gradient(100deg, #8ce8ff, #bb9dff);
+            background-clip: text;
+            color: transparent
+        }
+
+        header p {
+            color: #bac5df
+        }
+
+        h2 {
+            margin: 0 0 16px;
+            font-size: 1.3rem
+        }
+
+        .panel {
+            border: 1px solid #394663;
+            background: #1b2338e8;
+            border-radius: 20px;
+            padding: clamp(18px, 3vw, 26px);
+            margin: 18px 0;
+            box-shadow: 0 12px 30px #0003
+        }
+
+        .muted {
+            color: #b7c5dd
+        }
+
+        .hint {
+            font-size: .87rem;
+            color: #acb9d1
+        }
+
+        .upload {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap
+        }
+
+        .btn {
+            background: #8ce8ff;
+            color: #122138;
+            border: 0;
+            border-radius: 11px;
+            padding: 12px 18px;
+            font-weight: 800;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 750
+        }
+
+        .btn:hover {
+            filter: brightness(1.08)
+        }
+
+        .btn.secondary {
+            background: #2b3852;
+            color: #f3f6ff;
+            border: 1px solid #50617d
+        }
+
+        .btn:focus-visible,
+        a:focus-visible,
+        select:focus-visible {
+            outline: 3px solid #fff;
+            outline-offset: 3px
+        }
+
+        input[type=file] {
+            max-width: 100%;
+            color: #b7c5dd
+        }
+
+        input::file-selector-button {
+            background: #2b3852;
+            border: 1px solid #50617d;
+            border-radius: 8px;
+            color: white;
+            padding: 9px 12px;
+            margin-right: 12px;
+            cursor: pointer
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px
+        }
+
+        .metric {
+            background: #263149;
+            border: 1px solid #495875;
+            border-radius: 14px;
+            padding: 17px
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 2rem;
+            color: #8ce8ff
+        }
+
+        .metric span {
+            color: #b7c5dd;
+            font-size: .9rem
+        }
+
+        .tablewrap {
+            overflow-x: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left
+        }
+
+        th,
+        td {
+            padding: 12px 11px;
+            border-bottom: 1px solid #394663;
+            white-space: nowrap
+        }
+
+        th {
+            color: #b7c5dd;
+            font-size: .85rem
+        }
+
+        tr:last-child td {
+            border: 0
+        }
+
+        tbody tr:hover {
+            background: #263149
+        }
+
+        button.link {
+            background: none;
+            border: 0;
+            color: #8ce8ff;
+            font: inherit;
+            font-weight: 750;
+            cursor: pointer;
+            padding: 0;
+            text-align: left
+        }
+
+        button.link:hover {
+            text-decoration: underline
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px
+        }
+
+        .layout .panel {
+            margin: 0
+        }
+
+        .pill {
+            font-size: .75rem;
+            background: #304f77;
+            color: #bce8ff;
+            border-radius: 20px;
+            padding: 4px 9px
+        }
+
+        .winner {
+            color: #75e7b7;
+            font-weight: 750
+        }
+
+        .empty {
+            color: #acb9d1;
+            padding: 16px 0
+        }
+
+        .error {
+            color: #ffa0b0
+        }
+
+        .selectrow {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px
+        }
+
+        select {
+            background: #101a2d;
+            border: 1px solid #536382;
+            color: white;
+            border-radius: 9px;
+            padding: 10px 12px;
+            font: inherit;
+            max-width: 100%
+        }
+
+        #details {
+            display: none
+        }
+
+        .footer {
+            text-align: center;
+            color: #8e9bb6;
+            font-size: .85rem;
+            margin-top: 30px
+        }
+
+        a {
+            color: #8ce8ff
+        }
+
+        @media(max-width:700px) {
+            .layout {
+                grid-template-columns: 1fr
+            }
+
+            .cards {
+                grid-template-columns: repeat(3, minmax(0, 1fr))
+            }
+
+            .metric {
+                padding: 12px
+            }
+
+            .metric strong {
+                font-size: 1.5rem
+            }
+
+            th,
+            td {
+                padding: 10px 8px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrap">
+        <header>
+            <div class="eyebrow">⚛ Chemistry challenge</div>
+            <h1>Showdown Stats</h1>
+            <p>Every element. Every rivalry. Every victory.</p><a href="elements.html">← Back to Element Showdown</a>
+        </header>
+        <section class="panel">
+            <h2>Load match history</h2>
+            <div class="upload"><input type="file" id="file" accept=".json,application/json"
+                    aria-label="Select Firebase JSON export"><button class="btn secondary" id="clear"
+                    type="button">Clear</button></div>
+            <p class="hint">Select a Firebase Realtime Database JSON export containing <code>matchHistory</code>. The
+                file stays in your browser; nothing is uploaded. Loading a new export replaces the current statistics.
+            </p>
+            <p id="status" role="status" class="muted">No data loaded yet.</p>
+        </section>
+        <div id="dashboard" hidden>
+            <div class="cards">
+                <div class="metric"><strong id="total">0</strong><span>Completed matches</span></div>
+                <div class="metric"><strong id="players">0</strong><span>Unique player IDs</span></div>
+                <div class="metric"><strong id="rivalries">0</strong><span>Head-to-head pairings</span></div>
+            </div>
+            <section class="panel">
+                <h2>🏆 Leaderboard</h2>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Player</th>
+                                <th>W</th>
+                                <th>L</th>
+                                <th>T</th>
+                                <th>Win %</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard"></tbody>
+                    </table>
+                </div>
+            </section>
+            <section class="panel" id="details">
+                <h2>Player details</h2>
+                <div class="selectrow"><label for="playerSelect">Player</label><select id="playerSelect"></select></div>
+                <p id="playerSummary" class="muted"></p>
+                <h3>Head-to-head</h3>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Opponent</th>
+                                <th>W</th>
+                                <th>L</th>
+                                <th>T</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody id="headtohead"></tbody>
+                    </table>
+                </div>
+            </section>
+            <section class="panel">
+                <h2>🧪 Recent matches</h2>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Match</th>
+                                <th>Score</th>
+                                <th>Winner</th>
+                                <th>Difficulty</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <p class="footer">Made for curious chemists · Element Showdown</p>
+    </main>
+    <script>
+        'use strict';
+        const $ = id => document.getElementById(id);
+        let matches = [], playerMap = new Map();
+        const cell = (tr, value, className = '') => { const td = document.createElement('td'); td.textContent = String(value); if (className) td.className = className; tr.append(td); return td; };
+        const makeRow = tbody => { const tr = document.createElement('tr'); tbody.append(tr); return tr; };
+        const pct = p => p.games ? ((p.wins + p.ties * .5) / p.games * 100).toFixed(1) + '%' : '—';
+        const nameFor = uid => playerMap.get(uid)?.name || 'Unknown';
+        const score = (a, b) => `${a}–${b}`;
+        const date = ts => Number.isFinite(ts) && ts > 0 ? new Date(ts).toLocaleString() : 'Unknown date';
+        function parseMatches(json) {
+            const history = json?.matchHistory;
+            if (!history || typeof history !== 'object' || Array.isArray(history)) throw Error('No matchHistory object found in this export.');
+            const output = [];
+            for (const [room, entries] of Object.entries(history)) {
+                if (!entries || typeof entries !== 'object') continue;
+                for (const [id, m] of Object.entries(entries)) {
+                    if (!m?.host?.uid || !m?.guest?.uid || !Number.isFinite(m.hostScore) || !Number.isFinite(m.guestScore)) continue;
+                    output.push({ room, id, host: { uid: String(m.host.uid), name: String(m.host.name || 'Unknown') }, guest: { uid: String(m.guest.uid), name: String(m.guest.name || 'Unknown') }, hostScore: m.hostScore, guestScore: m.guestScore, completedAt: Number(m.completedAt) || 0, difficulty: String(m.difficulty || 'Unknown'), direction: String(m.direction || 'Unknown') });
+                }
+            }
+            return output.sort((a, b) => b.completedAt - a.completedAt);
+        }
+        function buildPlayers() {
+            playerMap = new Map();
+            function ensure(p) { if (!playerMap.has(p.uid)) playerMap.set(p.uid, { uid: p.uid, name: p.name, wins: 0, losses: 0, ties: 0, games: 0, points: 0, against: 0, opponents: new Map() }); return playerMap.get(p.uid); }
+            // Oldest to newest: display the most recently used nickname for each anonymous UID.
+            for (const m of [...matches].reverse()) {
+                const a = ensure(m.host), b = ensure(m.guest); a.name = m.host.name; b.name = m.guest.name;
+                const outcome = Math.sign(m.hostScore - m.guestScore);
+                for (const [p, opp, points, against, result] of [[a, b, m.hostScore, m.guestScore, outcome], [b, a, m.guestScore, m.hostScore, -outcome]]) {
+                    p.games++; p.points += points; p.against += against;
+                    if (result > 0) p.wins++; else if (result < 0) p.losses++; else p.ties++;
+                    if (!p.opponents.has(opp.uid)) p.opponents.set(opp.uid, { uid: opp.uid, wins: 0, losses: 0, ties: 0, points: 0, against: 0 });
+                    const h = p.opponents.get(opp.uid); h.points += points; h.against += against;
+                    if (result > 0) h.wins++; else if (result < 0) h.losses++; else h.ties++;
+                }
+            }
+        }
+        function sortedPlayers() { return [...playerMap.values()].sort((a, b) => b.wins - a.wins || b.wins / (b.games || 1) - a.wins / (a.games || 1) || b.points - a.points || a.name.localeCompare(b.name)); }
+        function playerButton(tr, p) { const td = document.createElement('td'), btn = document.createElement('button'); btn.type = 'button'; btn.className = 'link'; btn.textContent = p.name; btn.addEventListener('click', () => selectPlayer(p.uid)); td.append(btn); tr.append(td); }
+        function selectPlayer(uid) {
+            const p = playerMap.get(uid); if (!p) return;
+            $('details').style.display = 'block'; $('playerSelect').value = uid;
+            $('playerSummary').textContent = `${p.games} matches · ${p.wins} wins · ${p.losses} losses · ${p.ties} ties · ${pct(p)} win rate · ${p.points} points scored`;
+            $('headtohead').replaceChildren();
+            const records = [...p.opponents.values()].sort((a, b) => b.wins - a.wins || nameFor(a.uid).localeCompare(nameFor(b.uid)));
+            for (const h of records) { const tr = makeRow($('headtohead')); cell(tr, nameFor(h.uid)); cell(tr, h.wins); cell(tr, h.losses); cell(tr, h.ties); cell(tr, score(h.points, h.against)); }
+        }
+        function render() {
+            buildPlayers(); const players = sortedPlayers();
+            $('total').textContent = matches.length; $('players').textContent = players.length;
+            $('rivalries').textContent = new Set(matches.map(m => [m.host.uid, m.guest.uid].sort().join('|'))).size;
+            $('leaderboard').replaceChildren();
+            for (const [i, p] of players.entries()) { const tr = makeRow($('leaderboard')); cell(tr, i + 1); playerButton(tr, p); cell(tr, p.wins); cell(tr, p.losses); cell(tr, p.ties); cell(tr, pct(p)); cell(tr, p.points); }
+            const selected = $('playerSelect').value; $('playerSelect').replaceChildren();
+            for (const p of players) { const opt = document.createElement('option'); opt.value = p.uid; opt.textContent = p.name; $('playerSelect').append(opt); }
+            if (players.length) selectPlayer(playerMap.has(selected) ? selected : players[0].uid);
+            $('recent').replaceChildren();
+            for (const m of matches) { const tr = makeRow($('recent')); cell(tr, date(m.completedAt)); cell(tr, `${m.host.name} vs ${m.guest.name}`); cell(tr, score(m.hostScore, m.guestScore)); const winner = m.hostScore === m.guestScore ? 'Tie' : m.hostScore > m.guestScore ? m.host.name : m.guest.name; cell(tr, winner, winner === 'Tie' ? '' : 'winner'); cell(tr, m.difficulty); }
+            $('dashboard').hidden = false;
+        }
+        $('playerSelect').addEventListener('change', e => selectPlayer(e.target.value));
+        $('file').addEventListener('change', async e => {
+            const file = e.target.files?.[0]; if (!file) return;
+            try {
+                const data = JSON.parse(await file.text()); const parsed = parseMatches(data); matches = parsed; render(); $('status').className = 'muted'; $('status').textContent = `Loaded ${matches.length} completed match${matches.length === 1 ? '' : 'es'} from ${file.name}.`;
+            } catch (err) { $('status').className = 'error'; $('status').textContent = `Could not load file: ${err.message}`; }
+        });
+        $('clear').addEventListener('click', () => { matches = []; playerMap.clear(); $('file').value = ''; $('dashboard').hidden = true; $('status').className = 'muted'; $('status').textContent = 'No data loaded yet.'; });
+    </script>
+</body>
+
+</html>
