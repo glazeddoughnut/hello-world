@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Element Showdown</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+            background: #101525;
+            color: #f5f7ff
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 10% 0%, #26395b 0, transparent 52%), #101525
+        }
+
+        .wrap {
+            max-width: 760px;
+            margin: auto;
+            padding: 32px 18px 70px
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: .23em;
+            color: #9dc4ff;
+            font-size: .76rem;
+            font-weight: 800
+        }
+
+        h1 {
+            font-size: clamp(2.4rem, 8vw, 4.4rem);
+            margin: 8px 0;
+            background: linear-gradient(100deg, #8ce8ff, #bb9dff);
+            background-clip: text;
+            color: transparent
+        }
+
+        header p {
+            color: #bac5df;
+            margin: 0
+        }
+
+        .panel {
+            border: 1px solid #394663;
+            background: #1b2338e8;
+            border-radius: 22px;
+            padding: clamp(20px, 5vw, 36px);
+            box-shadow: 0 16px 40px #0004
+        }
+
+        h2 {
+            margin: 0 0 20px
+        }
+
+        fieldset {
+            border: 0;
+            padding: 0;
+            margin: 0 0 24px
+        }
+
+        legend {
+            font-weight: 750;
+            margin-bottom: 10px
+        }
+
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 9px
+        }
+
+        .pill {
+            position: relative;
+            display: block
+        }
+
+        .pill input {
+            position: absolute;
+            opacity: 0
+        }
+
+        .pill span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 52px;
+            padding: 8px;
+            border: 1px solid #495875;
+            border-radius: 12px;
+            background: #263149;
+            cursor: pointer;
+            font-size: .9rem
+        }
+
+        .pill input:checked+span {
+            background: #304f77;
+            border-color: #87d9ff;
+            box-shadow: inset 0 0 0 1px #87d9ff
+        }
+
+        .pill input:focus-visible+span {
+            outline: 3px solid #fff;
+            outline-offset: 2px
+        }
+
+        .hint {
+            font-size: .85rem;
+            color: #acb9d1;
+            margin-top: 9px
+        }
+
+        .btn {
+            border: 0;
+            background: #8ce8ff;
+            color: #122138;
+            font-weight: 800;
+            border-radius: 12px;
+            padding: 15px 22px;
+            cursor: pointer;
+            font-size: 1rem
+        }
+
+        .btn:hover {
+            filter: brightness(1.08)
+        }
+
+        .btn:focus-visible,
+        .answer:focus-visible {
+            outline: 3px solid #fff;
+            outline-offset: 3px
+        }
+
+        .btn.secondary {
+            background: #2b3852;
+            color: #f3f6ff;
+            border: 1px solid #50617d
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 22px
+        }
+
+        .muted {
+            color: #b7c5dd
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        .scorebar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-weight: 700
+        }
+
+        .scorebar span:last-child {
+            color: #9de6ff
+        }
+
+        .progress {
+            height: 7px;
+            background: #34425c;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 26px
+        }
+
+        .progress>div {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #78dbff, #bda1ff);
+            transition: width .2s
+        }
+
+        .question {
+            text-align: center;
+            padding: 22px 10px 28px
+        }
+
+        .question small {
+            display: block;
+            color: #b7c5dd;
+            font-weight: 650;
+            letter-spacing: .04em
+        }
+
+        .question strong {
+            display: block;
+            font-size: clamp(3.3rem, 13vw, 6.8rem);
+            line-height: 1.25;
+            margin: 12px 0;
+            overflow-wrap: anywhere
+        }
+
+        .answers {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px
+        }
+
+        .answer {
+            background: #293650;
+            border: 1px solid #536382;
+            color: white;
+            min-height: 88px;
+            border-radius: 15px;
+            padding: 12px;
+            font-size: clamp(1rem, 3vw, 1.28rem);
+            font-weight: 750;
+            cursor: pointer
+        }
+
+        .answer:hover:not(:disabled) {
+            border-color: #91e6ff;
+            background: #344664
+        }
+
+        .answer:disabled {
+            cursor: default;
+            opacity: .68
+        }
+
+        .answer.correct {
+            background: #174b3d;
+            border-color: #5ee3ad;
+            opacity: 1
+        }
+
+        .answer.wrong {
+            background: #612b40;
+            border-color: #ff879c;
+            opacity: 1
+        }
+
+        .feedback {
+            min-height: 46px;
+            margin-top: 19px;
+            font-size: 1.06rem;
+            font-weight: 750
+        }
+
+        .feedback.good {
+            color: #75e7b7
+        }
+
+        .feedback.bad {
+            color: #ffa0b0
+        }
+
+        .result {
+            text-align: center
+        }
+
+        .result .big {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #8ce8ff
+        }
+
+        .result p {
+            line-height: 1.6
+        }
+
+        .note {
+            margin-top: 25px;
+            color: #8e9bb6;
+            text-align: center;
+            font-size: .82rem
+        }
+
+        @media(max-width:450px) {
+            .choices {
+                grid-template-columns: 1fr
+            }
+
+            .pill span {
+                min-height: 44px
+            }
+
+            .answers {
+                gap: 9px
+            }
+
+            .answer {
+                min-height: 76px
+            }
+
+            .panel {
+                padding: 20px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrap">
+        <header>
+            <div class="eyebrow">⚛ Chemistry challenge</div>
+            <h1>Element Showdown</h1>
+            <p>Know your elements. Prove it.</p>
+        </header>
+        <section id="setup" class="panel">
+            <h2>Set up your match</h2>
+            <fieldset>
+                <legend>Difficulty</legend>
+                <div class="choices"><label class="pill"><input type="radio" name="difficulty" value="common"
+                            checked><span>Common<br>30 elements</span></label><label class="pill"><input type="radio"
+                            name="difficulty" value="less"><span>Less Common<br>88 elements</span></label><label
+                        class="pill"><input type="radio" name="difficulty" value="all"><span>All<br>118
+                            elements</span></label></div>
+                <div class="hint">Common uses the first 30 elements by atomic number. Less Common uses the remaining 88.
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Question direction</legend>
+                <div class="choices"><label class="pill"><input type="radio" name="direction"
+                            value="symbol"><span>Symbol → Name</span></label><label class="pill"><input type="radio"
+                            name="direction" value="name"><span>Name → Symbol</span></label><label class="pill"><input
+                            type="radio" name="direction" value="mixed" checked><span>Mixed</span></label></div>
+            </fieldset>
+            <div class="actions"><button class="btn" id="start">Start solo practice</button></div>
+            <p class="hint">20 questions, no repeated elements. Multiplayer rooms are coming next.</p>
+        </section>
+        <section id="game" class="panel hidden" aria-live="polite">
+            <div class="scorebar"><span id="round">Round 1 of 20</span><span id="score">Score: 0</span></div>
+            <div class="progress">
+                <div id="progress"></div>
+            </div>
+            <div class="question"><small id="prompt">Which element is this?</small><strong id="clue"></strong></div>
+            <div id="answers" class="answers"></div>
+            <div id="feedback" class="feedback" role="status"></div>
+            <div class="actions"><button class="btn hidden" id="next">Next question →</button><button
+                    class="btn secondary" id="quit">End practice</button></div>
+        </section>
+        <section id="results" class="panel result hidden">
+            <h2>Match complete!</h2>
+            <div class="big" id="finalScore"></div>
+            <p id="finalMessage"></p>
+            <div class="actions" style="justify-content:center"><button class="btn" id="again">Play
+                    again</button><button class="btn secondary" id="settings">Change settings</button></div>
+        </section>
+        <p class="note">Made for curious chemists · Element Showdown</p>
+    </main>
+    <script>
+        'use strict';
+        // Atomic-number order. Keep this dataset shared when multiplayer is added.
+        const raw = `H|Hydrogen;He|Helium;Li|Lithium;Be|Beryllium;B|Boron;C|Carbon;N|Nitrogen;O|Oxygen;F|Fluorine;Ne|Neon;Na|Sodium;Mg|Magnesium;Al|Aluminum;Si|Silicon;P|Phosphorus;S|Sulfur;Cl|Chlorine;Ar|Argon;K|Potassium;Ca|Calcium;Sc|Scandium;Ti|Titanium;V|Vanadium;Cr|Chromium;Mn|Manganese;Fe|Iron;Co|Cobalt;Ni|Nickel;Cu|Copper;Zn|Zinc;Ga|Gallium;Ge|Germanium;As|Arsenic;Se|Selenium;Br|Bromine;Kr|Krypton;Rb|Rubidium;Sr|Strontium;Y|Yttrium;Zr|Zirconium;Nb|Niobium;Mo|Molybdenum;Tc|Technetium;Ru|Ruthenium;Rh|Rhodium;Pd|Palladium;Ag|Silver;Cd|Cadmium;In|Indium;Sn|Tin;Sb|Antimony;Te|Tellurium;I|Iodine;Xe|Xenon;Cs|Cesium;Ba|Barium;La|Lanthanum;Ce|Cerium;Pr|Praseodymium;Nd|Neodymium;Pm|Promethium;Sm|Samarium;Eu|Europium;Gd|Gadolinium;Tb|Terbium;Dy|Dysprosium;Ho|Holmium;Er|Erbium;Tm|Thulium;Yb|Ytterbium;Lu|Lutetium;Hf|Hafnium;Ta|Tantalum;W|Tungsten;Re|Rhenium;Os|Osmium;Ir|Iridium;Pt|Platinum;Au|Gold;Hg|Mercury;Tl|Thallium;Pb|Lead;Bi|Bismuth;Po|Polonium;At|Astatine;Rn|Radon;Fr|Francium;Ra|Radium;Ac|Actinium;Th|Thorium;Pa|Protactinium;U|Uranium;Np|Neptunium;Pu|Plutonium;Am|Americium;Cm|Curium;Bk|Berkelium;Cf|Californium;Es|Einsteinium;Fm|Fermium;Md|Mendelevium;No|Nobelium;Lr|Lawrencium;Rf|Rutherfordium;Db|Dubnium;Sg|Seaborgium;Bh|Bohrium;Hs|Hassium;Mt|Meitnerium;Ds|Darmstadtium;Rg|Roentgenium;Cn|Copernicium;Nh|Nihonium;Fl|Flerovium;Mc|Moscovium;Lv|Livermorium;Ts|Tennessine;Og|Oganesson`;
+        const elements = raw.split(';').map((part, i) => { const [symbol, name] = part.split('|'); return { number: i + 1, symbol, name }; });
+        if (elements.length !== 118) throw Error('Element dataset must contain 118 entries');
+        const $ = id => document.getElementById(id);
+        const pick = name => document.querySelector(`input[name="${name}"]:checked`).value;
+        const shuffle = items => { const a = [...items]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; };
+        let match = null;
+        function show(section) { for (const id of ['setup', 'game', 'results']) $(id).classList.toggle('hidden', id !== section); }
+        function start() { const difficulty = pick('difficulty'), direction = pick('direction'); const pool = difficulty === 'common' ? elements.slice(0, 30) : difficulty === 'less' ? elements.slice(30) : elements; match = { pool, questions: shuffle(pool).slice(0, 20), direction, index: 0, score: 0, answered: false }; show('game'); render(); }
+        function render() { const { questions, index, score, pool, direction } = match; match.answered = false; const element = questions[index]; const mode = direction === 'mixed' ? (Math.random() < .5 ? 'symbol' : 'name') : direction; match.mode = mode; $('round').textContent = `Round ${index + 1} of ${questions.length}`; $('score').textContent = `Score: ${score}`; $('progress').style.width = `${index / questions.length * 100}%`; $('prompt').textContent = mode === 'symbol' ? 'Which element has this symbol?' : 'What is the symbol for this element?'; $('clue').textContent = mode === 'symbol' ? element.symbol : element.name; $('feedback').textContent = ''; $('feedback').className = 'feedback'; $('next').classList.add('hidden'); const distractors = shuffle(pool.filter(e => e !== element)).slice(0, 3); const answers = shuffle([element, ...distractors]); const container = $('answers'); container.replaceChildren(); for (const item of answers) { const btn = document.createElement('button'); btn.className = 'answer'; btn.textContent = mode === 'symbol' ? item.name : item.symbol; btn.dataset.number = item.number; btn.addEventListener('click', () => answer(item.number)); container.append(btn); } }
+        function answer(number) { if (match.answered) return; match.answered = true; const correct = match.questions[match.index]; const won = number === correct.number; if (won) match.score++; $('score').textContent = `Score: ${match.score}`; for (const btn of $('answers').children) { btn.disabled = true; const n = Number(btn.dataset.number); if (n === correct.number) btn.classList.add('correct'); else if (n === number) btn.classList.add('wrong'); } const fb = $('feedback'); fb.className = 'feedback ' + (won ? 'good' : 'bad'); fb.textContent = won ? 'Correct! +1 point' : `Not quite — ${correct.symbol} is ${correct.name}.`; $('next').textContent = match.index === match.questions.length - 1 ? 'See results →' : 'Next question →'; $('next').classList.remove('hidden'); $('next').focus(); }
+        function next() { if (!match || !match.answered) return; match.index++; if (match.index >= match.questions.length) { $('progress').style.width = '100%'; $('finalScore').textContent = `${match.score} / ${match.questions.length}`; $('finalMessage').textContent = match.score === 20 ? 'Perfect score! You know your elements.' : match.score >= 15 ? 'Excellent work! Ready for a rematch?' : match.score >= 10 ? 'Nice effort! A little more practice and you’ll be unstoppable.' : 'Every chemist starts somewhere. Give it another shot!'; show('results'); } else render(); }
+        $('start').addEventListener('click', start); $('next').addEventListener('click', next); $('quit').addEventListener('click', () => show('setup')); $('again').addEventListener('click', start); $('settings').addEventListener('click', () => show('setup'));
+    </script>
+</body>
+
+</html>
