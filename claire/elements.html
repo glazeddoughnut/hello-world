@@ -431,6 +431,7 @@
     </main>
     <script>
         'use strict';
+        const numquestions = 20;
         // Atomic-number order. Keep this dataset shared when multiplayer is added.
         const raw = `H|Hydrogen;He|Helium;Li|Lithium;Be|Beryllium;B|Boron;C|Carbon;N|Nitrogen;O|Oxygen;F|Fluorine;Ne|Neon;Na|Sodium;Mg|Magnesium;Al|Aluminum;Si|Silicon;P|Phosphorus;S|Sulfur;Cl|Chlorine;Ar|Argon;K|Potassium;Ca|Calcium;Sc|Scandium;Ti|Titanium;V|Vanadium;Cr|Chromium;Mn|Manganese;Fe|Iron;Co|Cobalt;Ni|Nickel;Cu|Copper;Zn|Zinc;Ga|Gallium;Ge|Germanium;As|Arsenic;Se|Selenium;Br|Bromine;Kr|Krypton;Rb|Rubidium;Sr|Strontium;Y|Yttrium;Zr|Zirconium;Nb|Niobium;Mo|Molybdenum;Tc|Technetium;Ru|Ruthenium;Rh|Rhodium;Pd|Palladium;Ag|Silver;Cd|Cadmium;In|Indium;Sn|Tin;Sb|Antimony;Te|Tellurium;I|Iodine;Xe|Xenon;Cs|Cesium;Ba|Barium;La|Lanthanum;Ce|Cerium;Pr|Praseodymium;Nd|Neodymium;Pm|Promethium;Sm|Samarium;Eu|Europium;Gd|Gadolinium;Tb|Terbium;Dy|Dysprosium;Ho|Holmium;Er|Erbium;Tm|Thulium;Yb|Ytterbium;Lu|Lutetium;Hf|Hafnium;Ta|Tantalum;W|Tungsten;Re|Rhenium;Os|Osmium;Ir|Iridium;Pt|Platinum;Au|Gold;Hg|Mercury;Tl|Thallium;Pb|Lead;Bi|Bismuth;Po|Polonium;At|Astatine;Rn|Radon;Fr|Francium;Ra|Radium;Ac|Actinium;Th|Thorium;Pa|Protactinium;U|Uranium;Np|Neptunium;Pu|Plutonium;Am|Americium;Cm|Curium;Bk|Berkelium;Cf|Californium;Es|Einsteinium;Fm|Fermium;Md|Mendelevium;No|Nobelium;Lr|Lawrencium;Rf|Rutherfordium;Db|Dubnium;Sg|Seaborgium;Bh|Bohrium;Hs|Hassium;Mt|Meitnerium;Ds|Darmstadtium;Rg|Roentgenium;Cn|Copernicium;Nh|Nihonium;Fl|Flerovium;Mc|Moscovium;Lv|Livermorium;Ts|Tennessine;Og|Oganesson`;
         const elements = raw.split(';').map((part, i) => { const [symbol, name] = part.split('|'); return { number: i + 1, symbol, name }; });
@@ -440,12 +441,84 @@
         const shuffle = items => { const a = [...items]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; };
         let match = null;
         let multiplayerController = null;
-        function show(section) { for (const id of ['setup', 'join', 'lobby', 'game', 'results']) $(id).classList.toggle('hidden', id !== section); }
-        function start() { const difficulty = pick('difficulty'), direction = pick('direction'); const pool = difficulty === 'common' ? elements.slice(0, 30) : difficulty === 'less' ? elements.slice(30) : elements; match = { pool, questions: shuffle(pool).slice(0, 20), direction, index: 0, score: 0, answered: false }; show('game'); render(); }
-        function render() { const { questions, index, score, pool, direction } = match; match.answered = false; const element = questions[index]; const mode = direction === 'mixed' ? (Math.random() < .5 ? 'symbol' : 'name') : direction; match.mode = mode; $('round').textContent = `Round ${index + 1} of ${questions.length}`; $('score').textContent = `Score: ${score}`; $('progress').style.width = `${index / questions.length * 100}%`; $('prompt').textContent = mode === 'symbol' ? 'Which element has this symbol?' : 'What is the symbol for this element?'; $('clue').textContent = mode === 'symbol' ? element.symbol : element.name; $('feedback').textContent = ''; $('feedback').className = 'feedback'; $('next').classList.add('hidden'); const distractors = shuffle(pool.filter(e => e !== element)).slice(0, 3); const answers = shuffle([element, ...distractors]); const container = $('answers'); container.replaceChildren(); for (const item of answers) { const btn = document.createElement('button'); btn.className = 'answer'; btn.textContent = mode === 'symbol' ? item.name : item.symbol; btn.dataset.number = item.number; btn.addEventListener('click', () => answer(item.number)); container.append(btn); } }
-        function answer(number) { if (match.answered) return; match.answered = true; const correct = match.questions[match.index]; const won = number === correct.number; if (won) match.score++; $('score').textContent = `Score: ${match.score}`; for (const btn of $('answers').children) { btn.disabled = true; const n = Number(btn.dataset.number); if (n === correct.number) btn.classList.add('correct'); else if (n === number) btn.classList.add('wrong'); } const fb = $('feedback'); fb.className = 'feedback ' + (won ? 'good' : 'bad'); fb.textContent = won ? 'Correct! +1 point' : `Not quite — ${correct.symbol} is ${correct.name}.`; $('next').textContent = match.index === match.questions.length - 1 ? 'See results →' : 'Next question →'; $('next').classList.remove('hidden'); $('next').focus(); }
-        function next() { if (!match || !match.answered) return; match.index++; if (match.index >= match.questions.length) { $('progress').style.width = '100%'; $('finalScore').textContent = `${match.score} / ${match.questions.length}`; $('finalMessage').textContent = match.score === 20 ? 'Perfect score! You know your elements.' : match.score >= 15 ? 'Excellent work! Ready for a rematch?' : match.score >= 10 ? 'Nice effort! A little more practice and you’ll be unstoppable.' : 'Every chemist starts somewhere. Give it another shot!'; show('results'); } else render(); }
-        $('start').addEventListener('click', start); $('next').addEventListener('click', next); $('quit').addEventListener('click', () => { if (multiplayerController) multiplayerController.leave(); else show('setup'); }); $('again').addEventListener('click', () => { if (multiplayerController) multiplayerController.rematch(); else start(); }); $('settings').addEventListener('click', () => { if (multiplayerController) multiplayerController.leave(); else show('setup'); });
+        function show(section) {
+            for (const id of ['setup', 'join', 'lobby', 'game', 'results']) $(id).classList.toggle('hidden', id !== section);
+        }
+        function start() {
+            const difficulty = pick('difficulty'), direction = pick('direction');
+            const pool = difficulty === 'common' ? elements.slice(0, 30) : difficulty === 'less' ? elements.slice(30) : elements;
+            match = { pool, questions: shuffle(pool).slice(0, numquestions), direction, index: 0, score: 0, answered: false };
+            show('game');
+            render();
+        }
+        function render() {
+            const { questions, index, score, pool, direction } = match;
+            match.answered = false;
+            const element = questions[index];
+            const mode = direction === 'mixed' ? (Math.random() < .5 ? 'symbol' : 'name') : direction;
+            match.mode = mode;
+            $('round').textContent = `Round ${index + 1} of ${questions.length}`;
+            $('score').textContent = `Score: ${score}`; $('progress').style.width = `${index / questions.length * 100}%`;
+            $('prompt').textContent = mode === 'symbol' ? 'Which element has this symbol?' : 'What is the symbol for this element?';
+            $('clue').textContent = mode === 'symbol' ? element.symbol : element.name; $('feedback').textContent = '';
+            $('feedback').className = 'feedback'; $('next').classList.add('hidden');
+            const distractors = shuffle(pool.filter(e => e !== element)).slice(0, 3);
+            const answers = shuffle([element, ...distractors]);
+            const container = $('answers'); container.replaceChildren();
+            for (const item of answers) {
+                const btn = document.createElement('button');
+                btn.className = 'answer';
+                btn.textContent = mode === 'symbol' ? item.name : item.symbol;
+                btn.dataset.number = item.number;
+                btn.addEventListener('click', () => answer(item.number));
+                container.append(btn);
+            }
+        }
+        function answer(number) {
+            if (match.answered) return;
+            match.answered = true;
+            const correct = match.questions[match.index];
+            const won = number === correct.number;
+            if (won) match.score++;
+            $('score').textContent = `Score: ${match.score}`;
+            for (const btn of $('answers').children) {
+                btn.disabled = true;
+                const n = Number(btn.dataset.number);
+                if (n === correct.number) {
+                    btn.classList.add('correct');
+                } else if (n === number) {
+                    btn.classList.add('wrong');
+                }
+            }
+            const fb = $('feedback');
+            fb.className = 'feedback ' + (won ? 'good' : 'bad');
+            fb.textContent = won ? 'Correct! +1 point' : `Not quite — ${correct.symbol} is ${correct.name}.`;
+            $('next').textContent = match.index === match.questions.length - 1 ? 'See results →' : 'Next question →';
+            $('next').classList.remove('hidden');
+            $('next').focus();
+        }
+        function next() {
+            if (!match || !match.answered)
+                return;
+            match.index++;
+            if (match.index >= match.questions.length) {
+                $('progress').style.width = '100%';
+                $('finalScore').textContent = `${match.score} / ${match.questions.length}`;
+                $('finalMessage').textContent = match.score === 20
+                    ? 'Perfect score! You know your elements.'
+                    : match.score >= 15
+                        ? 'Excellent work! Ready for a rematch?'
+                        : match.score >= 10
+                            ? 'Nice effort! A little more practice and you’ll be unstoppable.'
+                            : 'Every chemist starts somewhere. Give it another shot!';
+                show('results');
+            } else render();
+        }
+        $('start').addEventListener('click', start);
+        $('next').addEventListener('click', next);
+        $('quit').addEventListener('click', () => { if (multiplayerController) multiplayerController.leave(); else show('setup'); });
+        $('again').addEventListener('click', () => { if (multiplayerController) multiplayerController.rematch(); else start(); });
+        $('settings').addEventListener('click', () => { if (multiplayerController) multiplayerController.leave(); else show('setup'); });
     </script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js';
@@ -486,7 +559,7 @@
         }
         function makeQuestions(room) {
             const pool = poolFor(room.difficulty);
-            return shuffle(pool).slice(0, 20).map(element => ({ number: element.number, mode: room.direction === 'mixed' ? (Math.random() < .5 ? 'symbol' : 'name') : room.direction, options: shuffle([element, ...shuffle(pool.filter(x => x.number !== element.number)).slice(0, 3)]).map(x => x.number) }));
+            return shuffle(pool).slice(0, numquestions).map(element => ({ number: element.number, mode: room.direction === 'mixed' ? (Math.random() < .5 ? 'symbol' : 'name') : room.direction, options: shuffle([element, ...shuffle(pool.filter(x => x.number !== element.number)).slice(0, 3)]).map(x => x.number) }));
         }
         function isHost(room) {
             return room.host.uid === user.uid;
@@ -503,7 +576,7 @@
             $('roomSettings').textContent = 'Difficulty: ' + ({ common: 'Common (30)', less: 'Less Common (88)', all: 'All (118)' }[room.difficulty] || room.difficulty) + ' · Direction: ' + ({ symbol: 'Symbol → Name', name: 'Name → Symbol', mixed: 'Mixed' }[room.direction] || room.direction);
             $('lobbyRole').textContent = isHost(room) ? 'You are the host.' : 'You joined the room!';
             $('lobbyStatus').textContent = room.guest ? 'Both players connected! Host can start the match.' : 'Waiting for another player to join...';
-            //$('lobbyStart').disabled = !(isHost(room) && room.guest);
+            $('lobbyStart').disabled = !(isHost(room) && room.guest);
             $('lobbyStart').hidden = !(isHost(room) && room.guest);
             $('lobbyStart').textContent = 'Start Showdown!';
             show('lobby');
@@ -517,14 +590,20 @@
                 $('finalMessage').textContent = hostWon ? `${room.host.name} wins!` : guestWon ? `${room.guest.name} wins!` : 'It’s a tie!';
                 $('again').textContent = isHost(room) ? 'Start rematch' : 'Waiting for host to rematch';
                 $('again').disabled = !isHost(room);
-                $('settings').textContent = 'Leave room'; show('results'); return;
+                $('settings').textContent = 'Leave room';
+                saveMatchResult();
+                show('results');
+                return;
             }
-            if (g.phase === 'resolved' && isHost(room)) scheduleAdvance(g);
-            else clearTimeout(advanceTimer);
+            if (g.phase === 'resolved' && isHost(room))
+                scheduleAdvance(g);
+            else {
+                clearTimeout(advanceTimer);
+            }
             const q = g.questions[g.index], element = elements[q.number - 1];
-            $('round').textContent = `Round ${g.index + 1} of 20`;
+            $('round').textContent = `Round ${g.index + 1} of ${g.questions.length}`;
             $('score').textContent = scoreText(room);
-            $('progress').style.width = `${g.index / 20 * 100}%`;
+            $('progress').style.width = `${g.index / g.questions.length * 100}%`;
             $('prompt').textContent = q.mode === 'symbol' ? 'Which element has this symbol?' : 'What is the symbol for this element?';
             $('clue').textContent = q.mode === 'symbol' ? element.symbol : element.name;
             const side = mySide(room), locked = g.phase !== 'playing' || g[side + 'Wrong'];
@@ -540,7 +619,10 @@
             if (g.phase === 'resolved') {
                 fb.textContent = g.winner === 'none' ? `Neither scored. ${element.symbol} is ${element.name}.` : `${g.winner === 'host' ? room.host.name : room.guest.name} scores! ${element.symbol} is ${element.name}.`;
                 fb.classList.add('good');
-            } else if (g[side + 'Wrong']) { fb.textContent = 'Incorrect — you’re out for this round. Waiting for your opponent.'; fb.classList.add('bad'); }
+            } else if (g[side + 'Wrong']) {
+                fb.textContent = 'Incorrect — you’re out for this round. Waiting for your opponent.';
+                fb.classList.add('bad');
+            }
             else fb.textContent = 'First correct answer wins the point!';
             $('next').classList.add('hidden');
             show('game');
@@ -553,7 +635,7 @@
                 try {
                     await runTransaction(ref(db, 'rooms/' + roomCode + '/game'), current => {
                         if (!current || current.phase !== 'resolved' || current.index !== round || current.revision !== revision) return;
-                        return { ...current, index: round + 1, phase: round === 19 ? 'finished' : 'playing', hostWrong: false, guestWrong: false, winner: '', revision: current.revision + 1 };
+                        return { ...current, index: round + 1, phase: round === current.questions.length - 1 ? 'finished' : 'playing', hostWrong: false, guestWrong: false, winner: '', revision: current.revision + 1 };
                     }, { applyLocally: false });
                 } catch (e) { message('feedback', 'Could not advance: ' + e.message); }
             }, Math.max(0, g.resolvedAt + 2000 - Date.now()));
@@ -568,35 +650,110 @@
                     if (!current || current.phase !== 'playing' || current[side + 'Wrong']) return;
                     const correct = current.questions[current.index].number === number;
                     const next = { ...current, revision: current.revision + 1, lastActor: side, lastPick: number };
-                    if (correct) { next[side + 'Score']++; next.phase = 'resolved'; next.winner = side; next.resolvedAt = Date.now(); }
-                    else { next[side + 'Wrong'] = true; if (next.hostWrong && next.guestWrong) { next.phase = 'resolved'; next.winner = 'none'; next.resolvedAt = Date.now(); } }
+                    if (correct) {
+                        next[side + 'Score']++;
+                        next.phase = 'resolved';
+                        next.winner = side;
+                        next.resolvedAt = Date.now();
+                    }
+                    else {
+                        next[side + 'Wrong'] = true;
+                        if (next.hostWrong && next.guestWrong) {
+                            next.phase = 'resolved';
+                            next.winner = 'none';
+                            next.resolvedAt = Date.now();
+                        }
+                    }
                     return next;
                 }, { applyLocally: false });
             } catch (e) { $('feedback').textContent = 'Answer failed: ' + e.message; } finally { actionBusy = false; }
         }
         async function startShowdown() {
             if (!roomCode || !roomState || !isHost(roomState) || !roomState.guest) return;
-            $('lobbyStart').disabled = true; message('lobbyError', '');
+            $('lobbyStart').disabled = true;
+            message('lobbyError', '');
             try {
                 const questions = makeQuestions(roomState);
+                const startedAt = Date.now();
                 const result = await runTransaction(ref(db, 'rooms/' + roomCode + '/game'), current => {
-                    if (current && current.phase !== 'finished') return;
-                    return { questions, index: 0, phase: 'playing', hostScore: 0, guestScore: 0, hostWrong: false, guestWrong: false, winner: '', resolvedAt: 0, revision: 0, lastActor: '', lastPick: 0 };
+                    if (current && current.phase !== 'finished')
+                        return;
+                    return { questions, startedAt, index: 0, phase: 'playing', hostScore: 0, guestScore: 0, hostWrong: false, guestWrong: false, winner: '', resolvedAt: 0, revision: 0, lastActor: '', lastPick: 0 };
                 }, { applyLocally: false });
                 if (!result.committed) throw Error('A game is already running.');
             } catch (e) { message('lobbyError', 'Could not start: ' + e.message); $('lobbyStart').disabled = false; }
         }
         function openLobby(code) {
-            stopListening(); roomCode = code; $('roomCode').textContent = code;
+            stopListening();
+            roomCode = code;
+            $('roomCode').textContent = code;
             unsubscribe = onValue(ref(db, 'rooms/' + code), snapshot => {
-                const room = snapshot.val(); if (!room) { message('lobbyError', 'This room is no longer available.'); show('lobby'); return; }
+                const room = snapshot.val();
+                if (!room) {
+                    message('lobbyError', 'This room is no longer available.');
+                    show('lobby');
+                    return;
+                }
                 roomState = room;
                 if (room.game) {
                     const gameKey = `${room.game.phase}:${room.game.index}:${room.game.revision}`;
-                    if (previousGameKey !== gameKey) { previousGameKey = gameKey; renderMultiplayer(room); }
+                    if (previousGameKey !== gameKey) {
+                        previousGameKey = gameKey;
+                        renderMultiplayer(room);
+                    }
                 } else showLobby(room);
             }, error => { message('lobbyError', 'Unable to read room: ' + error.message); show('lobby'); });
         }
+
+        async function saveMatchResult() {
+
+            console.log('Saving match result:', {
+                roomCode,
+                phase: roomState?.game?.phase,
+                isHost: roomState && isHost(roomState),
+                startedAt: roomState?.game?.startedAt
+            });
+            if (!roomCode || !roomState?.game ||
+                roomState.game.phase !== 'finished' ||
+                !isHost(roomState)) return;
+
+            const room = roomState;
+            const game = room.game;
+
+            if (!game.startedAt) return;
+
+            const result = {
+                completedAt: Date.now(),
+                host: {
+                    uid: room.host.uid,
+                    name: room.host.name
+                },
+                guest: {
+                    uid: room.guest.uid,
+                    name: room.guest.name
+                },
+                hostScore: game.hostScore,
+                guestScore: game.guestScore,
+                difficulty: room.difficulty,
+                direction: room.direction
+            };
+
+            const historyRef = ref(
+                db,
+                `matchHistory/${roomCode}/${game.startedAt}`
+            );
+
+            try {
+                await runTransaction(historyRef, current => {
+                    // Save once, even if Firebase sends repeated updates.
+                    if (current !== null) return;
+                    return result;
+                }, { applyLocally: false });
+            } catch (error) {
+                console.error('Failed to save match result:', error);
+            }
+        }
+
         $('lobbyStart').addEventListener('click', startShowdown);
         multiplayerController = {
             leave() { stopListening(); roomCode = null; show('setup'); },
