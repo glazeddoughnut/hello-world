@@ -295,14 +295,10 @@
             <p>Every element. Every rivalry. Every victory.</p><a href="elements.html">← Back to Element Showdown</a>
         </header>
         <section class="panel">
-            <h2>Load match history</h2>
-            <div class="upload"><input type="file" id="file" accept=".json,application/json"
-                    aria-label="Select Firebase JSON export"><button class="btn secondary" id="clear"
-                    type="button">Clear</button></div>
-            <p class="hint">Select a Firebase Realtime Database JSON export containing <code>matchHistory</code>. The
-                file stays in your browser; nothing is uploaded. Loading a new export replaces the current statistics.
+            <h2>Live match history</h2>
+            <p id="status" role="status" class="muted">
+                Connecting to Firebase...
             </p>
-            <p id="status" role="status" class="muted">No data loaded yet.</p>
         </section>
         <div id="dashboard" hidden>
             <div class="cards">
@@ -369,7 +365,18 @@
         </div>
         <p class="footer">Made for curious chemists · Element Showdown</p>
     </main>
-    <script>
+    <script type="module">
+        import { initializeApp } from
+            'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+
+        import { getDatabase, ref, onValue } from
+            'https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js';
+
+        const app = initializeApp({
+            databaseURL: 'https://element-showdown-default-rtdb.firebaseio.com'
+        });
+
+        const db = getDatabase(app);
         'use strict';
         const $ = id => document.getElementById(id);
         let matches = [], playerMap = new Map();
@@ -432,13 +439,27 @@
             $('dashboard').hidden = false;
         }
         $('playerSelect').addEventListener('change', e => selectPlayer(e.target.value));
-        $('file').addEventListener('change', async e => {
-            const file = e.target.files?.[0]; if (!file) return;
-            try {
-                const data = JSON.parse(await file.text()); const parsed = parseMatches(data); matches = parsed; render(); $('status').className = 'muted'; $('status').textContent = `Loaded ${matches.length} completed match${matches.length === 1 ? '' : 'es'} from ${file.name}.`;
-            } catch (err) { $('status').className = 'error'; $('status').textContent = `Could not load file: ${err.message}`; }
-        });
-        $('clear').addEventListener('click', () => { matches = []; playerMap.clear(); $('file').value = ''; $('dashboard').hidden = true; $('status').className = 'muted'; $('status').textContent = 'No data loaded yet.'; });
+        onValue(
+            ref(db, 'matchHistory'),
+            snapshot => {
+                matches = parseMatches({
+                    matchHistory: snapshot.val() || {}
+                });
+
+                render();
+
+                $('status').className = 'muted';
+                $('status').textContent =
+                    `Live · ${matches.length} completed matches`;
+            },
+            error => {
+                console.error('Firebase read failed:', error);
+
+                $('status').className = 'error';
+                $('status').textContent =
+                    `Could not load match history: ${error.message}`;
+            }
+        );
     </script>
 </body>
 

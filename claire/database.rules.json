@@ -1,0 +1,23 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$code": {
+        ".read": "auth != null && $code.matches(/^[A-HJ-NP-Z2-9]{5}$/)",
+        ".write": "auth != null && $code.matches(/^[A-HJ-NP-Z2-9]{5}$/) && ((!data.exists() && newData.child('host/uid').val() == auth.uid && newData.child('status').val() == 'waiting') || (data.exists() && (data.child('host/uid').val() == auth.uid || data.child('guest/uid').val() == auth.uid)))",
+        "guest": {
+          ".write": "auth != null && !data.exists() && newData.child('uid').val() == auth.uid && root.child('rooms').child($code).child('status').val() == 'waiting' && root.child('rooms').child($code).child('host/uid').val() != auth.uid"
+        }
+      }
+    },
+    "matchHistory": {
+      ".read": true,
+      "$code": {
+        "$matchId": {
+          ".write": "auth != null && !data.exists() && root.child('rooms').child($code).child('host/uid').val() == auth.uid && root.child('rooms').child($code).child('game/phase').val() == 'finished'"
+        }
+      }
+    }
+  }
+}
