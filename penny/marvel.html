@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marvel Villains Encyclopedia</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a comic-book/cinematic feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        marvelRed: '#ED1D24',
+                        marvelDark: '#151515',
+                        marvelCard: '#222222',
+                    },
+                    fontFamily: {
+                        'title': ['Anton', 'sans-serif'],
+                        'body': ['Roboto Condensed', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom scrollbar for a sleek look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #151515;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ED1D24;
+        }
+        
+        /* Card hover effects */
+        .villain-card {
+            transition: all 0.3s ease;
+        }
+        .villain-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(237, 29, 36, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-marvelDark text-gray-200 font-body min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-black border-b-[4px] border-marvelRed sticky top-0 z-50 shadow-2xl">
+        <div class="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <!-- Iconic Marvel-style logo block -->
+                <div class="bg-marvelRed text-white font-title text-4xl px-2 py-1 tracking-wider uppercase inline-block">
+                    VILLAINS
+                </div>
+                <h1 class="text-2xl font-bold uppercase tracking-widest hidden sm:block text-gray-300">Encyclopedia</h1>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="w-full md:w-96 relative">
+                <input type="text" id="searchInput" placeholder="Search by name, hero, or movie..." 
+                    class="w-full bg-gray-900 border-2 border-gray-700 text-white px-4 py-2 rounded-none focus:outline-none focus:border-marvelRed transition-colors duration-300 placeholder-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute right-3 top-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12 flex-grow">
+        <!-- Results Counter -->
+        <div class="mb-6 flex justify-between items-end border-b border-gray-800 pb-2">
+            <h2 class="text-xl text-gray-400 font-bold uppercase tracking-wider">Database Entries</h2>
+            <span id="resultCount" class="text-marvelRed font-title text-2xl">0</span>
+        </div>
+
+        <!-- Villain Grid -->
+        <div id="villainGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Cards will be injected here by JavaScript -->
+        </div>
+
+        <!-- No Results State -->
+        <div id="noResults" class="hidden text-center py-20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h3 class="text-2xl font-title uppercase text-gray-400">No Villain Found</h3>
+            <p class="text-gray-500 mt-2">Try adjusting your search terms.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black py-6 border-t border-gray-800 text-center">
+        <p class="text-gray-600 text-sm">Marvel Villains Encyclopedia &copy; 2023. Created for educational/demonstration purposes.</p>
+    </footer>
+
+    <!-- JavaScript Data and Logic -->
+    <script>
+        // Villain Database
+        const villains = [
+            {
+                name: "Thanos",
+                description: "The Mad Titan who sought to collect all six Infinity Stones to wipe out half of all life in the universe, believing it would bring balance and save planets from resource depletion.",
+                heroes: ["Avengers", "Guardians of the Galaxy", "Doctor Strange"],
+                movies: ["The Avengers", "Guardians of the Galaxy", "Avengers: Infinity War", "Avengers: Endgame"]
+            },
+            {
+                name: "Loki",
+                description: "The Asgardian God of Mischief. Driven by jealousy of his brother Thor and a desire for a throne, he frequently shifts between villain, anti-hero, and ally.",
+                heroes: ["Thor", "Avengers", "TVA"],
+                movies: ["Thor", "The Avengers", "Thor: Ragnarok", "Loki (Series)"]
+            },
+            {
+                name: "Ultron",
+                description: "An artificial intelligence created by Tony Stark and Bruce Banner for peace-keeping, who deduced that the only way to save humanity was to cause its extinction.",
+                heroes: ["Avengers", "Vision"],
+                movies: ["Avengers: Age of Ultron", "What If...?"]
+            },
+            {
+                name: "Killmonger",
+                description: "Erik Stevens, an exiled Wakandan royal and former US black-ops soldier. He sought to dethrone T'Challa and use Wakanda's advanced weapons to arm oppressed people worldwide.",
+                heroes: ["Black Panther", "Dora Milaje"],
+                movies: ["Black Panther"]
+            },
+            {
+                name: "Hela",
+                description: "The Goddess of Death and Odin's firstborn. She was imprisoned for her bloodthirsty ambition but returned to claim the throne of Asgard and conquer all realms.",
+                heroes: ["Thor", "Valkyrie", "Hulk"],
+                movies: ["Thor: Ragnarok"]
+            },
+            {
+                name: "Green Goblin",
+                description: "Norman Osborn, a brilliant scientist and CEO driven insane by an experimental performance-enhancing formula, resulting in a sadistic, chaotic split personality.",
+                heroes: ["Spider-Man"],
+                movies: ["Spider-Man (2002)", "Spider-Man: No Way Home"]
+            },
+            {
+                name: "Doctor Octopus",
+                description: "Dr. Otto Octavius, a brilliant nuclear physicist whose mind was corrupted by four highly advanced mechanical appendages permanently fused to his spine after a lab accident.",
+                heroes: ["Spider-Man"],
+                movies: ["Spider-Man 2", "Spider-Man: No Way Home"]
+            },
+            {
+                name: "Red Skull",
+                description: "Johann Schmidt, the ruthless head of HYDRA. He was enhanced by an imperfect super-soldier serum and sought global domination using the Tesseract.",
+                heroes: ["Captain America"],
+                movies: ["Captain America: The First Avenger", "Avengers: Infinity War", "Avengers: Endgame"]
+            },
+            {
+                name: "Kang the Conqueror",
+                description: "A time-traveling entity with mastery over the multiverse. Different variants of Kang seek to conquer timelines or destroy competing universes to ensure their own supremacy.",
+                heroes: ["Ant-Man", "Wasp", "Loki", "Sylvie"],
+                movies: ["Ant-Man and the Wasp: Quantumania", "Loki (Series)"]
+            },
+            {
+                name: "Magneto",
+                description: "Erik Lehnsherr, a powerful mutant who can generate and control magnetic fields. A Holocaust survivor, he believes mutants are superior and fights for their dominance over humanity.",
+                heroes: ["X-Men", "Wolverine", "Professor X"],
+                movies: ["X-Men", "X2", "X-Men: First Class", "X-Men: Days of Future Past"]
+            },
+            {
+                name: "Venom",
+                description: "An alien symbiote that requires a host to survive. It bonds with Eddie Brock, forming a massive, vicious entity that clashes with Spider-Man before acting as a lethal protector.",
+                heroes: ["Spider-Man", "Riot", "Carnage"],
+                movies: ["Spider-Man 3", "Venom", "Venom: Let There Be Carnage"]
+            },
+            {
+                name: "Mysterio",
+                description: "Quentin Beck, a disgruntled former Stark Industries employee. He uses advanced holographic drone technology to create massive illusions, posing as an interdimensional hero.",
+                heroes: ["Spider-Man", "Nick Fury"],
+                movies: ["Spider-Man: Far From Home"]
+            },
+            {
+                name: "Vulture",
+                description: "Adrian Toomes, a blue-collar salvager who turns to the black market after losing a city contract to Tony Stark. He uses Chitauri tech to create a flying exo-suit and sell weapons.",
+                heroes: ["Spider-Man", "Iron Man"],
+                movies: ["Spider-Man: Homecoming"]
+            },
+            {
+                name: "Zemo",
+                description: "Helmut Zemo, a former Sokovian intelligence officer whose family died in the Battle of Sokovia. Lacking superpowers, he uses his intellect to manipulate and tear the Avengers apart from within.",
+                heroes: ["Captain America", "Iron Man", "Black Panther", "Falcon", "Winter Soldier"],
+                movies: ["Captain America: Civil War", "The Falcon and the Winter Soldier"]
+            },
+            {
+                name: "Winter Soldier",
+                description: "Bucky Barnes, Captain America's best friend. He was captured, brainwashed, and cybernetically enhanced by HYDRA to serve as an elite, cryogenically-preserved assassin for decades.",
+                heroes: ["Captain America", "Iron Man", "Black Widow", "Falcon"],
+                movies: ["Captain America: The Winter Soldier", "Captain America: Civil War"]
+            },
+            {
+                name: "Ronan the Accuser",
+                description: "A radical Kree warlord who refused to accept a peace treaty with Xandar. He sought the Power Stone to enact his own fanatical justice and destroy the Xandarian people.",
+                heroes: ["Guardians of the Galaxy", "Captain Marvel"],
+                movies: ["Guardians of the Galaxy", "Captain Marvel"]
+            },
+            {
+                name: "Ego",
+                description: "An ancient, god-like Celestial who takes the form of a living planet. He travels the universe seeking to assimilate all life into extensions of himself via his 'Expansion' plan.",
+                heroes: ["Guardians of the Galaxy"],
+                movies: ["Guardians of the Galaxy Vol. 2"]
+            },
+            {
+                name: "Kingpin",
+                description: "Wilson Fisk, the towering and physically imposing crime boss of New York City. He controls vast criminal networks and political influence while believing he is saving the city.",
+                heroes: ["Daredevil", "Spider-Man", "Hawkeye", "Echo", "Punisher"],
+                movies: ["Daredevil (Series)", "Spider-Man: Into the Spider-Verse", "Hawkeye", "Echo"]
+            }
+        ];
+
+        // DOM Elements
+        const grid = document.getElementById('villainGrid');
+        const searchInput = document.getElementById('searchInput');
+        const resultCount = document.getElementById('resultCount');
+        const noResults = document.getElementById('noResults');
+
+        // Render Function
+        function renderVillains(data) {
+            grid.innerHTML = '';
+            
+            if (data.length === 0) {
+                grid.classList.add('hidden');
+                noResults.classList.remove('hidden');
+            } else {
+                grid.classList.remove('hidden');
+                noResults.classList.add('hidden');
+                
+                data.forEach(villain => {
+                    // Extract initials for the placeholder image background
+                    const initials = villain.name.substring(0, 2).toUpperCase();
+                    
+                    const card = document.createElement('div');
+                    card.className = 'villain-card bg-marvelCard border border-gray-800 flex flex-col h-full overflow-hidden';
+                    
+                    card.innerHTML = `
+                        <!-- Card Header / Image Placeholder -->
+                        <div class="h-40 bg-gray-900 relative flex items-center justify-center border-b-[3px] border-gray-800 group overflow-hidden">
+                            <!-- Background pattern/initials -->
+                            <div class="absolute text-8xl font-title text-gray-800 opacity-30 select-none transform group-hover:scale-110 transition-transform duration-500">${initials}</div>
+                            
+                            <!-- Red overlay gradient on hover -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-marvelRed/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <h2 class="relative z-10 text-3xl font-title text-white uppercase tracking-wide text-center px-2 drop-shadow-md">
+                                ${villain.name}
+                            </h2>
+                        </div>
+                        
+                        <!-- Card Body -->
+                        <div class="p-5 flex-grow flex flex-col gap-4">
+                            <p class="text-sm text-gray-300 leading-relaxed flex-grow">
+                                ${villain.description}
+                            </p>
+                            
+                            <!-- Heroes section -->
+                            <div class="mt-2">
+                                <h3 class="text-xs uppercase text-marvelRed font-bold mb-2 flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.642 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.358-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clip-rule="evenodd" />
+                                    </svg>
+                                    Fought Against
+                                </h3>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${villain.heroes.map(hero => `
+                                        <span class="px-2 py-1 bg-gray-800 text-gray-300 text-[10px] uppercase tracking-wider rounded border border-gray-700">
+                                            ${hero}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Movies section -->
+                            <div class="mt-1">
+                                <h3 class="text-xs uppercase text-marvelRed font-bold mb-2 flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                                    </svg>
+                                    Appearances
+                                </h3>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${villain.movies.map(movie => `
+                                        <span class="px-2 py-1 bg-marvelRed/10 text-marvelRed text-[10px] uppercase tracking-wider rounded border border-marvelRed/30">
+                                            ${movie}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+            
+            // Update counter with animation
+            resultCount.textContent = data.length;
+            resultCount.classList.remove('scale-100');
+            resultCount.classList.add('scale-150');
+            setTimeout(() => {
+                resultCount.classList.remove('scale-150');
+                resultCount.classList.add('scale-100', 'transition-transform');
+            }, 150);
+        }
+
+        // Filter Logic
+        function filterVillains() {
+            const query = searchInput.value.toLowerCase().trim();
+            
+            if (query === '') {
+                renderVillains(villains);
+                return;
+            }
+            
+            const filteredData = villains.filter(v => {
+                const matchName = v.name.toLowerCase().includes(query);
+                const matchHero = v.heroes.some(h => h.toLowerCase().includes(query));
+                const matchMovie = v.movies.some(m => m.toLowerCase().includes(query));
+                
+                return matchName || matchHero || matchMovie;
+            });
+            
+            renderVillains(filteredData);
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', filterVillains);
+
+        // Initial Render
+        // Sort villains alphabetically by default
+        villains.sort((a, b) => a.name.localeCompare(b.name));
+        renderVillains(villains);
+        
+    </script>
+</body>
+</html>
